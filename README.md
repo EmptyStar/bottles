@@ -74,6 +74,6 @@ bottles.register_filled_bottle({
 })
 ```
 
-Note that this mod expects the target node(s) to be reigstered with Minetest prior to registering a filled bottle of its type, so if you wish to define new filled bottles with your own node targets, make sure to call `minetest.register_node` before calling `bottles.register_filled_bottle`. Also remember to add `bottles` to your dependency list in your mod's `mod.conf` file.
+Note that this mod expects the target node(s) to be registered with Minetest prior to registering a filled bottle of its type, so if you wish to define new filled bottles with your own node targets, make sure to call `minetest.register_node` before calling `bottles.register_filled_bottle`. Also remember to add `bottles` to your dependency list in your mod's `mod.conf` file.
 
 If you wish to further extend the uses and capabilities of empty glass bottles or filled bottles, the functions assigned to the `on_use` field of the bottles are defined as `bottles.fill` (assigned to empty glass bottles to fill them with a targeted material) and `bottles.spill` (to empty the contents of a filled bottle). These functions are provided so that you can override them or wrap them in programming logic -- a task that is beyond the scope of this documentation.
