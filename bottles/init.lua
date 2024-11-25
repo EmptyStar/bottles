@@ -1,4 +1,13 @@
--- Global
+-- Local wrapping functions for on_use reuse
+local function do_fill(...)
+  return bottles.fill(...)
+end
+
+local function do_spill(...)
+  return bottles.spill(...)
+end
+
+-- Globals
 bottles = {
 
   -- Registry of filled bottles
@@ -132,6 +141,11 @@ bottles = {
       end
     end
 
+    -- Extract node footstep sounds if possible and if no other sounds are provided
+    if not spec.sound and contents_node.sounds and contents_node.sounds.footstep then
+      spec.sound = contents_node.sounds.footstep.name
+    end
+
     -- Map target nodes to spec
     for _,target in ipairs(spec.target) do
       bottles.target_node_map[target] = spec
@@ -141,8 +155,8 @@ bottles = {
     bottles.registered_filled_bottles[spec.name] = spec
 
     -- Register new bottle node
-    minetest.register_node(spec.name,{
-      description = spec.description or ("Bottle of " .. contents_node.description),
+    minetest.register_node(":" .. spec.name,{
+      description = spec.description or ("Bottle of " .. contents_node.description:split("\n")[1]),
       drawtype = "plantlike",
       tiles = {spec.image},
       inventory_image = spec.image,
@@ -156,7 +170,7 @@ bottles = {
       },
       groups = {vessel = 1, dig_immediate = 3, attached_node = 1},
       sounds = default.node_sound_glass_defaults(),
-      on_use = bottles.spill,
+      on_use = do_spill
     })
 
     -- Successful registration
@@ -188,99 +202,5 @@ bottles = {
 -- Make empty glass bottles able to 'point and fill'
 minetest.override_item("vessels:glass_bottle",{
   liquids_pointable = true,
-  on_use = bottles.fill,
-})
-
--- Register filled bottles based on nodes in Minetest Game
-bottles.register_filled_bottle({
-  target = "default:water_source",
-  sound = "default_water_footstep",
-  name = "bottle_of_water",
-  description = "Bottle of Water",
-})
-
-bottles.register_filled_bottle({
-  target = "default:river_water_source",
-  sound = "default_water_footstep",
-  name = "bottle_of_river_water",
-  description = "Bottle of River Water",
-})
-
-bottles.register_filled_bottle({
-  target = "default:lava_source",
-  sound = "default_water_footstep",
-  name = "bottle_of_lava",
-  description = "Bottle of Lava",
-})
-
-bottles.register_filled_bottle({
-  target = "default:sand",
-  sound = "default_sand_footstep",
-})
-
-bottles.register_filled_bottle({
-  target = "default:desert_sand",
-  sound = "default_sand_footstep",
-})
-
-bottles.register_filled_bottle({
-  target = "default:silver_sand",
-  sound = "default_sand_footstep",
-})
-
-bottles.register_filled_bottle({
-  target = "default:dirt",
-  sound = "default_dig_crumbly",
-})
-
-bottles.register_filled_bottle({
-  target = "default:dry_dirt",
-  sound = "default_dig_crumbly",
-  name = "bottle_of_dry_dirt",
-  description = "Bottle of Dry Dirt",
-})
-
-bottles.register_filled_bottle({
-  target = "default:dirt_with_grass",
-  sound = "default_grass_footstep",
-  name = "bottle_of_grass",
-  description = "Bottle of Grass",
-})
-
-bottles.register_filled_bottle({
-  target = {"default:dirt_with_dry_grass","default:dry_dirt_with_dry_grass"},
-  sound = "default_grass_footstep",
-  name = "bottle_of_dry_grass",
-  description = "Bottle of Dry Grass",
-})
-
-bottles.register_filled_bottle({
-  target = "default:dirt_with_coniferous_litter",
-  sound = "default_grass_footstep",
-  name = "bottle_of_coniferous_litter",
-  description = "Bottle of Coniferous Litter",
-})
-
-bottles.register_filled_bottle({
-  target = "default:dirt_with_rainforest_litter",
-  sound = "default_grass_footstep",
-  name = "bottle_of_rainforest_litter",
-  description = "Bottle of Rainforest Litter",
-})
-
-bottles.register_filled_bottle({
-  target = "default:permafrost_with_moss",
-  sound = "default_grass_footstep",
-  name = "bottle_of_moss",
-  description = "Bottle of Moss",
-})
-
-bottles.register_filled_bottle({
-  target = "default:gravel",
-  sound = "default_gravel_footstep",
-})
-
-bottles.register_filled_bottle({
-  target = {"default:snow","default:snow_block","default:dirt_with_snow"},
-  sound = "default_sand_footstep",
+  on_use = do_fill,
 })

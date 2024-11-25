@@ -7,26 +7,16 @@ On their own, filled bottles are only good for collecting and decoration. Howeve
 
 Bottles function in a very similar fashion to buckets, but one key difference is that bottles *do not displace nor dispense any nodes*. Filling a bottle from a target node simply 'transforms' the empty glass bottle into a filled bottle, and emptying a filled bottle turns it back into an empty glass bottle. On a technical level, bottles don't 'carry' their contents the way buckets do.
 
-Filled Bottle Types
--------------------
+Supported games/mods
+--------------------
 
-By default, the following nodes from Minetest Game can be bottled to create a filled bottle of their type:
-
-- Water
-- River Water
-- Lava
-- Dirt
-- Dry Dirt
-- Grass
-- Dry Grass
-- Sand
-- Desert Sand
-- Silver Sand
-- Gravel
-- Tundra Moss
-- Coniferous Litter
-- Rainforest Litter
-- Snow
+- Minetest Game and its derivatives such as MeseCraft, Asuna, etc.
+- Ethereal
+- Everness
+- Wilhelmines Living Jungle
+- Wilhelmines Natural Biomes
+- Caverealms
+- Many biomes from the Biomes modpack by Atlante
 
 API
 ---
