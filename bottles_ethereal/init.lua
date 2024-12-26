@@ -12,5 +12,6 @@ for _,dirt in ipairs({
   bottles.register_filled_bottle({
     target = "ethereal:" .. dirt:lower() .. "_dirt",
     description = "Bottle of " .. dirt .. " Dirt",
+    replacement = "default:dirt",
   })
 end

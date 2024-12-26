@@ -5,7 +5,11 @@ Fill empty glass bottles with a variety of earthly materials including water, di
 
 On their own, filled bottles are only good for collecting and decoration. However, other mods may wish to make use of filled bottles for other purposes, such as for ingredients in cooking or chemistry. It's also possible to define your own filled bottles; see the API section below for details.
 
-Bottles function in a very similar fashion to buckets, but one key difference is that bottles *do not displace nor dispense any nodes*. Filling a bottle from a target node simply 'transforms' the empty glass bottle into a filled bottle, and emptying a filled bottle turns it back into an empty glass bottle. On a technical level, bottles don't 'carry' their contents the way buckets do.
+Bottles function in a very similar fashion to buckets with two key differences. First, many bottles may be filled from one single node before the node is exhausted (10 bottles by default), and an exhausted node may be fully consumed (e.g., sand or water) or replaced with a "stripped" version of itself (e.g., dirt with grass becomes only dirt). Secondly, emptying a filled bottle does not dispense its contents, it simply becomes an empty glass bottle when emptied. In this way, bottles are effectively "transformed" into other types of bottles but they do not actually carry their contents the way buckets do.
+
+Also note that partially bottled nodes have a chance to yield no drops when dug. This chance scales with how many times the node is bottled such that bottling a node more times increases the chance that it will not yield drops when dug. This is a balance measure to prevent infinite bottling of a single node.
+
+The chance to yield no drops does not apply to liquids by default as liquids can easily be exploited to bypass this restriction, but this can be changed via settings if needed for a special case.
 
 Supported games/mods
 --------------------
@@ -28,6 +32,9 @@ Want to create your own filled bottles? Use the `bottles.register_filled_bottle`
   target = <string or array>, -- the node to target for a bottle to be filled
                               -- from; either a string for a single node name
                               -- or an array that is a list of node names
+
+  replacement = <string>, -- the node to replace the target node(s) with when
+                          -- a target node is fully drained; default is "air"
 
   name = <string>, -- a name for the filled bottle item; will be prefixed with
                    -- `bottles:`, so don't include any such namespace; default

@@ -7,14 +7,37 @@ local function do_spill(...)
   return bottles.spill(...)
 end
 
+-- Local map for liquid category to int for simple comparison
+local liquid_map = {
+  none = 0,
+  source = 1,
+  flowing = 2,
+}
+
 -- Globals
 bottles = {
+  -- Settings
+  settings = {
+    node_fill_limit = tonumber(core.settings:get("bottles.node_fill_limit",10) or 10),
+    liquid_fill_unlimited = (function(value)
+      if value == "all" then
+        return 1
+      elseif value == "flowing" then
+        return 2
+      else
+        return 3
+      end
+    end)(core.settings:get("bottles.liquid_fill_unlimited","all") or "all"),
+  },
 
   -- Registry of filled bottles
   registered_filled_bottles = {},
 
   -- Index target nodes to their filled bottle types
   target_node_map = {},
+
+  -- Cache node liquid statuses for special liquid handling
+  target_liquid_map = {},
 
   -- Play a sound whenever a bottle is filled or spilled
   play_bottle_sound = function(pos,sound)
@@ -32,7 +55,8 @@ bottles = {
   fill = function(itemstack,placer,target)
     if target.type == "node" and placer:is_player() then
       -- Get targeted node
-      local node = minetest.get_node(target.under)
+      local pos = target.under
+      local node = minetest.get_node(pos)
       local  filled_bottle = bottles.target_node_map[node.name]
       if filled_bottle then
         -- Play contents sound
@@ -53,11 +77,24 @@ bottles = {
           end
         end
 
+        -- Set filled node metadata if enabled; special handling for liquids
+        local liquid = bottles.target_liquid_map[node.name]
+        if bottles.settings.node_fill_limit > 0 and liquid < bottles.settings.liquid_fill_unlimited then
+          local meta = core.get_meta(pos)
+          local limit = meta:get_int("bottles.node_fill_limit")
+          limit = limit + 1
+          if limit >= bottles.settings.node_fill_limit then
+            core.set_node(pos,{ name = filled_bottle.replacement })
+          else
+            meta:set_int("bottles.node_fill_limit",limit)
+          end
+        end
+
         -- Return value
-        return retval
+        return retval, filled_bottle.name
       end
     end
-    return itemstack
+    return itemstack, nil
   end,
 
   -- Spill the contents out of a filled bottle
@@ -112,6 +149,10 @@ bottles = {
       return false
     end
 
+    spec.description = spec.description or ("Bottle of " .. contents_node.description:split("\n")[1])
+
+    spec.replacement = spec.replacement or "air"
+
     if spec.image then
       -- do nothing
     elseif type(contents_node.tiles[1]) == "string" then
@@ -134,9 +175,9 @@ bottles = {
       spec.target = {spec.target}
     end
 
-    -- Ensure that target nodes are not already in use, fail registration if so
+    -- Ensure that target nodes exist and are not already in use, fail registration if so
     for _,target in ipairs(spec.target) do
-      if bottles.target_node_map[target] then
+      if bottles.target_node_map[target] or not core.registered_nodes[target] then
         return false
       end
     end
@@ -146,9 +187,10 @@ bottles = {
       spec.sound = contents_node.sounds.footstep.name
     end
 
-    -- Map target nodes to spec
+    -- Map target nodes and liquid status to spec
     for _,target in ipairs(spec.target) do
       bottles.target_node_map[target] = spec
+      bottles.target_liquid_map[target] = liquid_map[core.registered_nodes[target].liquidtype or "none"]
     end
 
     -- Put bottle into map of registered filled bottles
@@ -156,7 +198,7 @@ bottles = {
 
     -- Register new bottle node
     minetest.register_node(":" .. spec.name,{
-      description = spec.description or ("Bottle of " .. contents_node.description:split("\n")[1]),
+      description = spec.description,
       drawtype = "plantlike",
       tiles = {spec.image},
       inventory_image = spec.image,
@@ -204,3 +246,17 @@ minetest.override_item("vessels:glass_bottle",{
   liquids_pointable = true,
   on_use = do_fill,
 })
+
+-- Nodes that have been partially filled have a chance to drop nothing when dug
+if bottles.settings.node_fill_limit > 0 then
+  local oghnd = core.handle_node_drops
+  core.handle_node_drops = function(pos, drops, digger)
+    local meta = core.get_meta(pos)
+    local limit = meta:get_int("bottles.node_fill_limit")
+    if limit > 0 and math.random(1,bottles.settings.node_fill_limit) <= limit then
+      -- do nothing, node will drop nothing
+    else
+      return oghnd(pos, drops, digger)
+    end
+  end
+end
