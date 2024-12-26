@@ -51,6 +51,7 @@ bottles.register_filled_bottle({
   sound = "default_grass_footstep",
   name = "bottle_of_grass",
   description = "Bottle of Grass",
+  replacement = "default:dirt",
 })
 
 bottles.register_filled_bottle({
@@ -58,6 +59,7 @@ bottles.register_filled_bottle({
   sound = "default_grass_footstep",
   name = "bottle_of_dry_grass",
   description = "Bottle of Dry Grass",
+  replacement = "default:dry_dirt",
 })
 
 bottles.register_filled_bottle({
@@ -65,6 +67,7 @@ bottles.register_filled_bottle({
   sound = "default_grass_footstep",
   name = "bottle_of_coniferous_litter",
   description = "Bottle of Coniferous Litter",
+  replacement = "default:dirt",
 })
 
 bottles.register_filled_bottle({
@@ -72,6 +75,7 @@ bottles.register_filled_bottle({
   sound = "default_grass_footstep",
   name = "bottle_of_rainforest_litter",
   description = "Bottle of Rainforest Litter",
+  replacement = "default:dirt",
 })
 
 bottles.register_filled_bottle({
@@ -79,6 +83,7 @@ bottles.register_filled_bottle({
   sound = "default_grass_footstep",
   name = "bottle_of_moss",
   description = "Bottle of Tundra Moss",
+  replacement = "default:permafrost_with_stones",
 })
 
 bottles.register_filled_bottle({
