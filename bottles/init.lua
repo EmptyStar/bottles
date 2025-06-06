@@ -176,9 +176,15 @@ bottles = {
     end
 
     -- Ensure that target nodes exist and are not already in use, fail registration if so
+    -- Also capture brightest light from target nodes which the filled bottle will inherit
+    local max_light = 0
     for _,target in ipairs(spec.target) do
-      if bottles.target_node_map[target] or not core.registered_nodes[target] then
+      local tnode = core.registered_nodes[target]
+      if not tnode or bottles.target_node_map[target] then
         return false
+      end
+      if (tnode.light_source or 0) > max_light then
+        max_light = tnode.light_source
       end
     end
 
@@ -204,6 +210,7 @@ bottles = {
       inventory_image = spec.image,
       wield_image = spec.image,
       paramtype = "light",
+      light_source = (max_light > 0 and max_light or nil),
       is_ground_content = false,
       walkable = false,
       selection_box = {
